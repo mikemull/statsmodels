@@ -46,15 +46,14 @@ def mnc2mc(mnc, wmean = True):
     n = len(mnc)
     mnc = np.insert(np.array(mnc), 0, 1, axis=0)  # add zero moment = 1
     mean = mnc[1]
-    mu = [] #np.zeros(n+1)
+    mu = np.zeros(mnc.shape)
     for n,m in enumerate(mnc):
-        mu.append(0)
         #[comb(n-1,k,exact=1) for k in range(n)]
         for k in range(n+1):
             mu[n] += (-1)**(n-k) * comb(n,k,exact=1) * mnc[k] * mean**(n-k)
     if wmean:
         mu[1] = mean
-    return mu[1:]
+    return mu[1:].tolist()
 
 
 def cum2mc(kappa):
@@ -68,17 +67,18 @@ def cum2mc(kappa):
 
 
     '''
-    mc = [1,0.0] #_kappa[0]]  #insert 0-moment and mean
     kappa0 = kappa[0]
-    kappa = [1] + list(kappa)
+    kappa = np.insert(np.array(kappa), 0, 1, axis=0)
+    mc = kappa.copy()
+    mc[1] = 0.0
     for nn,m in enumerate(kappa[2:]):
         n = nn+2
-        mc.append(0)
+        mc[n] = 0
         for k in range(n-1):
             mc[n] += comb(n-1,k,exact=1) * kappa[n-k]*mc[k]
 
     mc[1] = kappa0 # insert mean as first moments by convention
-    return mc[1:]
+    return mc[1:].tolist()
 
 
 def mnc2cum(mnc):
