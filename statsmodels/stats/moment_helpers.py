@@ -25,17 +25,17 @@ def mc2mnc(mc):
 
     '''
     n = len(mc)
-    mean = mc[0]
-    mc = [1] + list(mc)    # add zero moment = 1
+    mc = np.insert(np.array(mc), 0, 1, axis=0)  # add zero moment = 1
+    mean = mc[1].copy()
+    mnc = mc.copy()
     mc[1] = 0  # define central mean as zero for formula
-    mnc = [1, mean] # zero and first raw moments
     for nn,m in enumerate(mc[2:]):
         n=nn+2
-        mnc.append(0)
+        mnc[n] = 0
         for k in range(n+1):
             mnc[n] += comb(n,k,exact=1) * mc[k] * mean**(n-k)
 
-    return mnc[1:]
+    return mnc[1:].tolist()
 
 
 def mnc2mc(mnc, wmean = True):
@@ -44,8 +44,8 @@ def mnc2mc(mnc, wmean = True):
 
     '''
     n = len(mnc)
-    mean = mnc[0]
-    mnc = [1] + list(mnc)    # add zero moment = 1
+    mnc = np.insert(np.array(mnc), 0, 1, axis=0)  # add zero moment = 1
+    mean = mnc[1]
     mu = [] #np.zeros(n+1)
     for n,m in enumerate(mnc):
         mu.append(0)
@@ -87,15 +87,14 @@ def mnc2cum(mnc):
 
     http://en.wikipedia.org/wiki/Cumulant#Cumulants_and_moments
     '''
-    mnc = [1] + list(mnc)
-    kappa = [1]
+    mnc = np.insert(mnc, 0, 1, axis=0)
+    kappa = mnc.copy()
     for nn,m in enumerate(mnc[1:]):
         n = nn+1
-        kappa.append(m)
         for k in range(1,n):
             kappa[n] -= comb(n-1,k-1,exact=1) * kappa[k]*mnc[n-k]
 
-    return kappa[1:]
+    return kappa[1:].tolist()
 
 
 def mc2cum(mc):
