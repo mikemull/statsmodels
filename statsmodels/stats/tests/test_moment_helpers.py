@@ -87,6 +87,41 @@ def test_moment_conversion():
         #assert_equal(mvsk2mnc(mc2mvsk(mom[0])), mc2mnc(mom[0]))
 
 
+def test_moment_conversion_vectorized():
+    # Additional tests of moment to cumulant calculations using array-like inputs
+    m = [[0.0, 1.0, 0.0],
+         [1,   1,   1],
+         [0,   0,   1],
+         [3,   3,   3]]
+
+    mnc_cum_expected = [[0.,  1.0, 0.0],
+                        [1.0, 0.0, 1.0],
+                        [0.0, -1.0, 1.0],
+                        [0.0, 6.0, 0.0]]
+
+    mc_cum_expected = [[0.,  1.0, 0.0],
+                       [1.0, 1.0, 1.0],
+                       [0.0, 0.0, 1.0],
+                       [0.0, 0.0, 0.0]]
+
+    cum_calc = mnc2cum(m)
+    assert_equal(cum_calc, mnc_cum_expected)
+    cum_calc = mnc2cum(np.array(m))
+    assert_equal(cum_calc, mnc_cum_expected)
+
+    cum_calc = mc2cum(m)
+    assert_equal(cum_calc, mc_cum_expected)
+    cum_calc = mc2cum(np.array(m))
+    assert_equal(cum_calc, mc_cum_expected)
+
+    # Try various combinations to verify api consistency
+    assert cum2mc(mc2cum(m)) == m
+    assert mc2cum(m) == mnc2cum(mc2mnc(m))
+    assert mnc2mc(mc2mnc(m)) == m
+    # With wmean=False the first central moment is zero
+    assert mnc2mc(mc2mnc(m), wmean=False)[0] == [0., 0., 0.]
+
+
 def test_moment_conversion_types():
     # written in 2009
     #why did I use list as return type
@@ -107,3 +142,4 @@ if __name__ == '__main__':
     test_cov2corr()
     test_moment_conversion()
     test_moment_conversion_types()
+    test_moment_conversion_vectorized()

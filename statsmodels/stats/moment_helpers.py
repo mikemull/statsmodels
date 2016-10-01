@@ -25,17 +25,17 @@ def mc2mnc(mc):
 
     '''
     n = len(mc)
-    mean = mc[0]
-    mc = [1] + list(mc)    # add zero moment = 1
+    mc = np.insert(np.array(mc), 0, 1, axis=0)  # add zero moment = 1
+    mean = mc[1].copy()
+    mnc = mc.copy()
     mc[1] = 0  # define central mean as zero for formula
-    mnc = [1, mean] # zero and first raw moments
     for nn,m in enumerate(mc[2:]):
         n=nn+2
-        mnc.append(0)
+        mnc[n] = 0
         for k in range(n+1):
             mnc[n] += comb(n,k,exact=1) * mc[k] * mean**(n-k)
 
-    return mnc[1:]
+    return mnc[1:].tolist()
 
 
 def mnc2mc(mnc, wmean = True):
@@ -44,17 +44,16 @@ def mnc2mc(mnc, wmean = True):
 
     '''
     n = len(mnc)
-    mean = mnc[0]
-    mnc = [1] + list(mnc)    # add zero moment = 1
-    mu = [] #np.zeros(n+1)
+    mnc = np.insert(np.array(mnc), 0, 1, axis=0)  # add zero moment = 1
+    mean = mnc[1]
+    mu = np.zeros(mnc.shape)
     for n,m in enumerate(mnc):
-        mu.append(0)
         #[comb(n-1,k,exact=1) for k in range(n)]
         for k in range(n+1):
             mu[n] += (-1)**(n-k) * comb(n,k,exact=1) * mnc[k] * mean**(n-k)
     if wmean:
         mu[1] = mean
-    return mu[1:]
+    return mu[1:].tolist()
 
 
 def cum2mc(kappa):
@@ -68,17 +67,18 @@ def cum2mc(kappa):
 
 
     '''
-    mc = [1,0.0] #_kappa[0]]  #insert 0-moment and mean
     kappa0 = kappa[0]
-    kappa = [1] + list(kappa)
+    kappa = np.insert(np.array(kappa), 0, 1, axis=0)
+    mc = kappa.copy()
+    mc[1] = 0.0
     for nn,m in enumerate(kappa[2:]):
         n = nn+2
-        mc.append(0)
+        mc[n] = 0
         for k in range(n-1):
             mc[n] += comb(n-1,k,exact=1) * kappa[n-k]*mc[k]
 
     mc[1] = kappa0 # insert mean as first moments by convention
-    return mc[1:]
+    return mc[1:].tolist()
 
 
 def mnc2cum(mnc):
@@ -87,15 +87,14 @@ def mnc2cum(mnc):
 
     http://en.wikipedia.org/wiki/Cumulant#Cumulants_and_moments
     '''
-    mnc = [1] + list(mnc)
-    kappa = [1]
+    mnc = np.insert(mnc, 0, 1, axis=0)
+    kappa = mnc.copy()
     for nn,m in enumerate(mnc[1:]):
         n = nn+1
-        kappa.append(m)
         for k in range(1,n):
             kappa[n] -= comb(n-1,k-1,exact=1) * kappa[k]*mnc[n-k]
 
-    return kappa[1:]
+    return kappa[1:].tolist()
 
 
 def mc2cum(mc):
