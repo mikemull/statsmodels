@@ -87,7 +87,7 @@ def test_moment_conversion():
         #assert_equal(mvsk2mnc(mc2mvsk(mom[0])), mc2mnc(mom[0]))
 
 
-def test_moment_to_cumulant_vectorized():
+def test_moment_conversion_vectorized():
     # Additional tests of moment to cumulant calculations using array-like inputs
     m = [[0.0, 1.0, 0.0],
          [1,   1,   1],
@@ -115,9 +115,11 @@ def test_moment_to_cumulant_vectorized():
     assert_equal(cum_calc, mc_cum_expected)
 
     # Try various combinations to verify api consistency
-    cum2mc(mc2cum(m)) == m
-    mc2cum(m) == mnc2cum(mc2mnc(m))
-    mnc2mc(mc2mnc(m)) == m
+    assert cum2mc(mc2cum(m)) == m
+    assert mc2cum(m) == mnc2cum(mc2mnc(m))
+    assert mnc2mc(mc2mnc(m)) == m
+    # With wmean=False the first central moment is zero
+    assert mnc2mc(mc2mnc(m), wmean=False)[0] == [0., 0., 0.]
 
 
 def test_moment_conversion_types():
@@ -140,4 +142,4 @@ if __name__ == '__main__':
     test_cov2corr()
     test_moment_conversion()
     test_moment_conversion_types()
-    test_moment_to_cumulant_vectorized()
+    test_moment_conversion_vectorized()
