@@ -60,7 +60,7 @@ matrix:
     - NUMPY=
     - SCIPY=
     - USEMPL=false
-    - PANDAS=0.18
+    - PANDAS=0.19
   - python: 2.7
     env:
     - PYTHON=3.5
