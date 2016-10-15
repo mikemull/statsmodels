@@ -8,7 +8,7 @@ from statsmodels.stats.anova import anova_lm
 from statsmodels.formula.api import ols
 from pandas import read_table
 
-kidney_table = StringIO("""Days      Duration Weight ID
+kidney_data = """Days      Duration Weight ID
     0.0      1      1      1
     2.0      1      1      2
     1.0      1      1      3
@@ -69,14 +69,14 @@ kidney_table = StringIO("""Days      Duration Weight ID
     9.0      2      3      8
     6.0      2      3      9
     1.0      2      3     10
-""")
+"""
 
 class TestAnovaLM(object):
     @classmethod
     def setupClass(cls):
         # kidney data taken from JT's course
         # don't know the license
-        kidney_table.seek(0)
+        kidney_table = StringIO(kidney_data)
         cls.data = read_table(kidney_table, sep="\s+")
         cls.kidney_lm = ols('np.log(Days+1) ~ C(Duration) * C(Weight)',
                         data=cls.data).fit()
@@ -100,7 +100,7 @@ class TestAnovaLMNoconstant(object):
     def setupClass(cls):
         # kidney data taken from JT's course
         # don't know the license
-        kidney_table.seek(0)
+        kidney_table = StringIO(kidney_data)
         cls.data = read_table(kidney_table, sep="\s+")
         cls.kidney_lm = ols('np.log(Days+1) ~ C(Duration) * C(Weight) - 1',
                         data=cls.data).fit()
